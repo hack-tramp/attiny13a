@@ -3,6 +3,6 @@ various programs for attiny13a
 
 to use c files in arduino IDE, just make an empty .ino file of the same name, and put them both in a folder of that name
 
-1. uart 
+- <b>uart</b> <br>
 basic Rx/Tx example, slimmed down version of https://github.com/Dolphin101546015/ATtiny13A-UART
 this works for bluetooth (baud 9600) module HC-06
