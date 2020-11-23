@@ -5,4 +5,4 @@ to use c files in arduino IDE, just make an empty .ino file of the same name, an
 
 - <b>uart</b> <br>
 basic Rx/Tx example, slimmed down version of https://github.com/Dolphin101546015/ATtiny13A-UART
-this works for bluetooth (baud 9600) module HC-06
+<br>this works for bluetooth (baud 9600) module HC-06
