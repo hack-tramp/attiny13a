@@ -5,5 +5,5 @@ to use c files in arduino IDE, just make an empty .ino file of the same name, an
 
 - <b>uart (166 bytes)</b> <br>
 slimmed down version of https://github.com/Dolphin101546015/ATtiny13A-UARTbasic 
-<br>Rx/Tx 'parrot' example
+<br>Rx/Tx 'echo' example
 <br>this works for bluetooth (baud 9600) module HC-06
