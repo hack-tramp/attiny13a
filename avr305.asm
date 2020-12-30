@@ -30,8 +30,7 @@ msg:	.byte	20	; text to be transmitted, stored in ram
 .cseg
 .org 0
 	rjmp	init
-    nop     ; IRQ0
-    rjmp PCINT      ; PCINT0 (pin INT0 to INT5) PCMSK, MCUCR
+
 
 
 .org 0x000A ; First address after interrupt vector table
@@ -96,14 +95,18 @@ ret
 ;*
 ;***************************************************************************
 
-getchar:	ldi 	bitcnt,9	;8 data bit + 1 stop bit
+getchar:	
 
-getchar1:	sbic 	PINB,RxD	;Wait for start bit
+		ldi 	bitcnt,9	;8 data bit + 1 stop bit
+getchar1:	
+
+		sbic 	PINB,RxD	;Wait for start bit
 		rjmp 	getchar1
 
 		rcall UART_delay	;0.5 bit delay
 
-getchar2:	rcall UART_delay	;1 bit delay
+getchar2:	
+		rcall UART_delay	;1 bit delay
 		rcall UART_delay		
 
 		clc			;clear carry
@@ -117,30 +120,16 @@ getchar2:	rcall UART_delay	;1 bit delay
 		rjmp 	getchar2	;   go get next
 
 getchar3:
-	ldi	ZL,LOW(msg)	; initialize Z pointer
-	ldi	ZH,HIGH(msg)	; to tx msg address
+
 	st Z+,Rxbyte
-	; null terminated string
-	ldi r16,0x00
-	st Z,r16
+	cpi Rxbyte,0x0D
+	brne getchar
+	ldi Rxbyte,0x00
+	st Z,Rxbyte
 	ret
 
 
-PCINT:  
-	in    r0,     0x3F    ;Store SREG          
-	push  r0          
-          
-	rcall getchar
 
-	clr r16
-	st Z, r16      ;  Zero string marker   
-	       
-	ldi r20, 0x80     ;  set rx flag 
-
-	pop   r0            ;  Restore SREG           
-	out   0x3F,   r0        
-
-reti   
 
 
 ;***************************************************************************
@@ -178,28 +167,13 @@ init:
 sbi	PORTB,TxD	;Init port pins
 sbi	DDRB,TxD
 
-;init for receiving
-ldi r16,0b00100000 ;GIMSK   = (1<<PCIE);   Enable External Interrupts 
-out GIMSK,r16
-ldi r16,0b00001000;PCMSK   = (1<<UART_RX);    Enable accorded Interrupt (PCINT3) 
-out PCMSK,r16
-sei;   Allow Interrupts  
+ldi	ZL,LOW(msg)	; initialize Z pointer
+ldi	ZH,HIGH(msg)	; to tx msg address
 
-
-ldi r20,0 ; rx flag
-
-ldi	Txbyte,12	;Clear terminal
-rcall	putchar
-
-
-
-forever:	
+main_loop:	
 	rcall	getchar
-	;mov	Txbyte,Rxbyte
-	;ld Txbyte,Z
-	;rcall putchar
-	;ldi Txbyte,0x61
-	;rcall putchar
 	rcall	UART_Send		;Echo received char
-	rjmp	forever
+	ldi	ZL,LOW(msg)	; initialize Z pointer
+	ldi	ZH,HIGH(msg)	; to tx msg address
+	rjmp main_loop
 
