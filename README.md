@@ -9,4 +9,5 @@ Rx/Tx 'echo' example based on AVR305 but :
 - stores data in RAM, null terminated
 - loops receiving bytes until 0x0D is detected, marking end of string
 - Tx routine loops over bytes in RAM until nullbyte marking end of string
-<br>tested on bluetooth (baud 9600) module HC-06, no noticeable loss / errors
+
+tested on bluetooth (baud 9600) module HC-06, no noticeable loss / errors
