@@ -1,8 +1,6 @@
 # attiny13a
 various programs for attiny13a
 
-to use c files in arduino IDE, just make an empty .ino file of the same name, and put them both in a folder of that name
-
 <b>UART </b> <br>
 Rx/Tx 'echo' example (140 bytes) based on AVR305 but :
 - can handle whole strings rather than just 1 byte
