@@ -105,15 +105,11 @@ PCINT:
 	ldi	ZL,LOW(msg)	; initialize Z pointer
 	ldi	ZH,HIGH(msg)	; to tx msg address      
 	    
-	sbic 	PINB,RxD ;if line is low (0), continue as we have a startbit
-	rjmp end_rx ;otherwise skip to end
-	getchar:	ldi 	bitcnt,9	;8 data bit + 1 stop bit
-
-	getchar1:	;sbic 	PINB,RxD	;Wait for start bit
-			;rjmp 	getchar1
-
+	cbi PCMSK,RxD ; turn off PCINT
+	getchar:	
+			ldi bitcnt,9	;8 data bit + 1 stop bit
+	getchar1:	
 			rcall UART_delay	;0.5 bit delay
-
 	getchar2:	
 			rcall UART_delay	;1 bit delay
 			rcall UART_delay		
@@ -136,10 +132,10 @@ PCINT:
 	
 	       
 	ldi r20, 0x80     ;  set rx flag 
+	sbi PCMSK,RxD ;re-enable PCINT
 
-	end_rx:
 	pop   r0            ;  Restore SREG           
-	out   0x3F,   r0        
+	out   0x3F,   r0   
 
 reti   
 
@@ -152,7 +148,7 @@ reti
 ;* transmitting and receiving bytes. The total execution time is set by the
 ;* constant "b":
 ;*
-;*	3·b + 7 cycles (including rcall and ret)
+;*	3Â·b + 7 cycles (including rcall and ret)
 
 
 .equ	b	= 163	;9600 bps @ 9.6 MHz crystal
