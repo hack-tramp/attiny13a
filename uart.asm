@@ -140,7 +140,7 @@ getchar3:
 ;* transmitting and receiving bytes. The total execution time is set by the
 ;* constant "b":
 ;*
-;*	3·b + 7 cycles (including rcall and ret)
+;*	3Â·b + 7 cycles (including rcall and ret)
 
 
 .equ	b	= 163	;9600 bps @ 9.6 MHz crystal
