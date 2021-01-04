@@ -1,6 +1,9 @@
 # attiny13a
 various programs for attiny13a
 
+<b>LED - ISR </b> <br>
+Example of using timer interrupt to control LED
+
 <b>UART </b> <br>
 Rx/Tx 'echo' example (140 bytes) based on AVR305 but :
 - can handle whole strings rather than just 1 byte
