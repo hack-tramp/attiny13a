@@ -1,5 +1,4 @@
 # attiny13a
-various programs for attiny13a
 
 <b>LED - ISR </b> <br>
 Example of using timer interrupt to control LED
