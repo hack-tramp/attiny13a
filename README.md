@@ -3,7 +3,7 @@
 <b>LED - ISR </b> <br>
 Example of using timer interrupt to control LED
 
-<b>UART </b> <br>
+<b>UART (Polling and ISR) </b> <br>
 Rx/Tx 'echo' example (140 bytes) based on AVR305 but :
 - can handle whole strings rather than just 1 byte
 - stores data in RAM, null terminated
