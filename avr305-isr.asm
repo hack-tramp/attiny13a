@@ -127,16 +127,27 @@ PCINT:
 	getchar3:
 
 		st Z+,Rxbyte 
-		ldi Rxbyte,0x00 ; null terminated string
-		st Z,Rxbyte
+		cpi Rxbyte,0x0D
+		breq exitrx
+		ldi bitcnt,9	;8 data bit + 1 stop bit
+		getc1:	
+			sbic PINB,RxD	;Wait for start bit
+		rjmp getc1
+		rjmp getchar1
+
+	exitrx:
+	ldi Rxbyte,0x0A ;add linebreak
+	st Z+,Rxbyte 
+	clr Rxbyte ; null terminated string
+	st Z,Rxbyte
 	
 	       
-	ldi r20, 0x80     ;  set rx flag 
-	sbi PCMSK,RxD ;re-enable PCINT
+	ldi r20, 0x80 ;set rx flag 
 
+
+	
 	pop   r0            ;  Restore SREG           
-	out   0x3F,   r0   
-
+	out   0x3F,   r0     
 reti   
 
 
@@ -148,7 +159,7 @@ reti
 ;* transmitting and receiving bytes. The total execution time is set by the
 ;* constant "b":
 ;*
-;*	3Â·b + 7 cycles (including rcall and ret)
+;*	3·b + 7 cycles (including rcall and ret)
 
 
 .equ	b	= 163	;9600 bps @ 9.6 MHz crystal
@@ -162,9 +173,12 @@ UART_delay1:
 ret
 
 uartd:
-	dec	temp ;1c
-	brne UART_delay1 ;1c
+	ldi	temp,143 ;1c
+	UART_d:	
+		dec	temp ;1c
+		brne UART_d ;1c
 ret
+
 
 ;***** Program Execution Starts Here
 
@@ -181,20 +195,21 @@ out GIMSK,r16
 sbi PCMSK,RxD ;PCMSK   = (1<<RxD);    Enable accorded Interrupt (PCINT3) 
 sei;   Allow Interrupts  
 
-
-ldi r20,0 ; rx flag
-
-
+clr r20 ; rx flag
 
 ;############################################
 ;;########### MAIN LOOP #####################
 ;############################################
 main_loop:
 
-
 	cpi r20,0x80 ;test rx flag
 	brne main_loop
 	rcall UART_Send 
+	wait_for_idle:
+	sbis 	PINB,RxD	;Wait for idle bit
+	rjmp 	wait_for_idle
+
+	sbi PCMSK,RxD ;re-enable PCINT
 	clr r20
 rjmp main_loop
 ;############################################
