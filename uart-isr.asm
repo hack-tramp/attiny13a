@@ -172,13 +172,6 @@ UART_delay1:
 	brne UART_delay1 ;1c
 ret
 
-uartd:
-	ldi	temp,143 ;1c
-	UART_d:	
-		dec	temp ;1c
-		brne UART_d ;1c
-ret
-
 
 ;***** Program Execution Starts Here
 
