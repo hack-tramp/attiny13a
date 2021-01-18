@@ -15,11 +15,11 @@ Example of using timer interrupt to control LED
 
 Rx/Tx 'echo' example (140 bytes) based on [AVR305](https://ww1.microchip.com/downloads/en/AppNotes/doc0952.pdf) but :<br>
 
-* Can handle whole strings rather than just 1 byte
-* Stores data in RAM, null terminated
-* Loops receiving bytes until 0x0D is detected, marking end of string
-* Tx routine loops over bytes in RAM until nullbyte marking end of string
-* ISR version handles all chars/bytes inside interrupt routine
+- Can handle whole strings rather than just 1 byte
+- Stores data in RAM, null terminated
+- Loops receiving bytes until 0x0D is detected, marking end of string
+- Tx routine loops over bytes in RAM until nullbyte marking end of string
+- ISR version handles all chars/bytes inside interrupt routine
 
   ## 💾 UART - SPM  
 
