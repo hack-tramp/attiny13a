@@ -1,17 +1,17 @@
 # attiny13a
 
-<b>MAX7219 8x8 LED Matrix </b> <br>
+<b> 💾 MAX7219 8x8 LED Matrix </b> <br>
 
 Supports scrolling text effect and custom 'graphics' - stored in flash
 
 
-<b>LED - ISR </b> <br>
+<b> 💾 LED - ISR </b> <br>
 
 Example of using timer interrupt to control LED
 
 *These UART codes were tested on bluetooth (baud 9600) module HC-06, no noticeable loss*<br>
 
-<b>UART - Polling and ISR </b> 
+<b> 💾 UART - Polling and ISR </b> 
 <br>
 
 Rx/Tx 'echo' example (140 bytes) based on [AVR305](https://ww1.microchip.com/downloads/en/AppNotes/doc0952.pdf) but :
@@ -22,7 +22,7 @@ Rx/Tx 'echo' example (140 bytes) based on [AVR305](https://ww1.microchip.com/dow
 - Tx routine loops over bytes in RAM until nullbyte marking end of string
 - ISR version handles all chars/bytes inside interrupt routine
 
-<b>UART - SPM </b> 
+<b> 💾 UART - SPM </b> 
 
 This allows you to write to flash memory (spm) via bluetooth. <br>
 It is useful when you need more than the 64 bytes of RAM.<br>
