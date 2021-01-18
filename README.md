@@ -1,5 +1,10 @@
 # attiny13a
 
+<b>MAX7219 8x8 LED Matrix </b> <br>
+
+Supports scrolling text effect and custom 'graphics' - stored in flash
+
+
 <b>LED - ISR </b> <br>
 
 Example of using timer interrupt to control LED
