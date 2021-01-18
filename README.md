@@ -21,7 +21,7 @@ Rx/Tx 'echo' example (140 bytes) based on [AVR305](https://ww1.microchip.com/dow
 - Tx routine loops over bytes in RAM until nullbyte marking end of string
 - ISR version handles all chars/bytes inside interrupt routine
 
-  ## 💾 UART - SPM  
+ ## 💾 UART - SPM  
 
 This allows you to write to flash memory (spm) via bluetooth. <br>
 It is useful when you need more than the 64 bytes of RAM.<br>
