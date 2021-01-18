@@ -13,8 +13,7 @@ Example of using timer interrupt to control LED
 
   ## 💾 UART - Polling and ISR 
 
-  
-Rx/Tx 'echo' example (140 bytes) based on [AVR305](https://ww1.microchip.com/downloads/en/AppNotes/doc0952.pdf) but :
+Rx/Tx 'echo' example (140 bytes) based on [AVR305](https://ww1.microchip.com/downloads/en/AppNotes/doc0952.pdf) but :<br>
 
 * can handle whole strings rather than just 1 byte
 * stores data in RAM, null terminated
@@ -22,7 +21,7 @@ Rx/Tx 'echo' example (140 bytes) based on [AVR305](https://ww1.microchip.com/dow
 * Tx routine loops over bytes in RAM until nullbyte marking end of string
 * ISR version handles all chars/bytes inside interrupt routine
 
-  ## 💾 UART - SPM </b> 
+  ## 💾 UART - SPM  
 
 This allows you to write to flash memory (spm) via bluetooth. <br>
 It is useful when you need more than the 64 bytes of RAM.<br>
