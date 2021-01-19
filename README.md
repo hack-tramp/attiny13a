@@ -2,7 +2,7 @@
 
   ## 💾 MAX7219 8x8 LED Matrix 
 *250 Bytes*  
-Supports scrolling text effect and custom 'graphics' - stored in flash
+Supports scrolling text effect and custom graphics - stored in flash
 
 
   ## 💾 LED - ISR 
