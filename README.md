@@ -23,9 +23,9 @@ Rx/Tx 'echo' example (140 bytes) based on [AVR305](https://ww1.microchip.com/dow
 
  ## 💾 UART - SPM  
 
-This allows you to write to flash memory (spm) via bluetooth. <br>
+This allows you to write to flash memory via bluetooth. <br>
 It is useful when you need more than the 64 bytes of RAM.<br>
-*(make sure you have set the fuses first to allow writing to flash)*<br>
+*(make sure you have set the fuses first to allow writing to flash via SPM)*<br>
 
 * UART 'mode' triggered by PCINT, ends after x ms
 * Data sent in (max) 32 byte chunks during this mode is appended to flash (no overwrite)
