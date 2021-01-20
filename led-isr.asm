@@ -1,3 +1,4 @@
+;based on https://embeddedthoughts.com/2016/05/27/attiny85-blinking-without-clock-cycles/
 .include "tn13Adef.inc"
 .org 0
 	rjmp	init
