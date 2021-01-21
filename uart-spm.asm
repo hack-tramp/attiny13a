@@ -130,9 +130,7 @@ main_loop:
 
 	;stuff we do outside the UART receiving mode:
 
-	;reset flash pointer if not already done 
-	ldi ZL,LOW(2*flash_data)
-	ldi ZH,HIGH(2*flash_data)
+
 
 
 rjmp main_loop
@@ -166,7 +164,15 @@ PCINT:
 	in    r0,     0x3F    ;Store SREG          
 	push  r0          
 	ldi	YL,LOW(msg)	; initialize pointer
-	ldi	YH,HIGH(msg)	; to tx msg address      
+	ldi	YH,HIGH(msg)	; to tx msg address    
+	
+	;if we just went into SPM mode 
+	cpi r20,0 ;all flags should still be zero
+	brne skip_spm_init ;if we're already in SPM mode, skip this
+	;initialize flash pointer
+	ldi ZL,LOW(2*flash_data)
+	ldi ZH,HIGH(2*flash_data)
+	skip_spm_init:	  
 	    
 	cbi PCMSK,RxD ; turn off PCINT
 	getchar:	
@@ -375,3 +381,4 @@ do_spm:
 	;out SREG, r19
 	;sei
 ret
+
