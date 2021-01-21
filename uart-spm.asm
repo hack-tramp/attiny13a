@@ -33,13 +33,13 @@ msg:	.byte	34	; allocate RAM space for UART data
 	rjmp init ;powerup / reset routine
     nop ; IRQ0
     rjmp PCINT ; PCINT0 (pin INT0 to INT5) PCMSK, MCUCR
-	nop ; Timer0 Overflow 
+	rjmp TOV ; Timer0 Overflow 
 	nop ; EEPROM Ready 
 	nop ; Analog Comparator 
-	rjmp TIMER0_COMPA ; Timer0 CompareA 
-    nop     ; Timer 0 compare B
-    nop     ; watchdog
-    nop     ; ADC conversion  
+	nop ; Timer0 CompareA 
+    nop ; Timer 0 compare B
+    nop ; watchdog
+    nop ; ADC conversion  
 
 
 
@@ -81,19 +81,18 @@ out GIMSK,r16
 sbi PCMSK,RxD ;PCMSK   = (1<<RxD);    Enable accorded Interrupt (PCINT3) 
 
 ;TIMER 
-ldi r16,0b10000000
-out TCCR0A,r16 ; Clear Timer on Compare match 
-
-ldi r16,255 ;  set the compare match value 
-out OCR0A,r16
+ldi r16,0b00000000
+out TCCR0A,r16 ; normal timer 0-255
 
 IN R16, TCCR0B	;clk I/O /1024 (From prescaler)		
 ORI R16, (1<<CS02) | (0<<CS01) | (1<<CS00) 
 OUT TCCR0B, R16
 
 ;clr r16 - shouldnt be needed as bitcnt is loaded before use in routines
-;clr r21 - not needed as 0 on powerup
-
+clr r21 - not needed as 0 on powerup
+;reset flash pointer if not already done 
+ldi ZL,LOW(2*flash_data)
+ldi ZH,HIGH(2*flash_data)
 
 sei;   Allow Interrupts  
 
@@ -111,7 +110,8 @@ main_loop:
 
 	sbrs r20,0;check rx flag
 	rjmp receiving_mode
-
+	;echo what was sent
+	;rcall UART_Send
 	;write the 32 bytes received to flash -if less recd it will run over trash in RAM til 32 bytes are reached
 	rcall write_page
 	;send flash contents to verify
@@ -145,7 +145,7 @@ rjmp main_loop
 ;*	Timer interrupt routine
 ;***************************************************************************
 
-TIMER0_COMPA:
+TOV:
 	 
 	inc r21 ;increase r21 - used in addition to prescaler of 1024
 	cpi r21,100 ; if r21 is at ?, then run the code below
@@ -157,6 +157,63 @@ TIMER0_COMPA:
 
 	end_t0:
 reti
+
+;***************************************************************************
+;* "getchar" - UART Interrupt routine
+;***************************************************************************
+
+PCINT:  
+	in    r0,     0x3F    ;Store SREG          
+	push  r0          
+	ldi	YL,LOW(msg)	; initialize pointer
+	ldi	YH,HIGH(msg)	; to tx msg address      
+	    
+	cbi PCMSK,RxD ; turn off PCINT
+	getchar:	
+			ldi bitcnt,9	;8 data bit + 1 stop bit
+	getchar1:	
+			rcall UART_delay	;0.5 bit delay
+	getchar2:	
+			rcall UART_delay	;1 bit delay
+			rcall UART_delay		
+
+			clc			;clear carry
+			sbic 	PINB,RxD	;if RX pin high
+			sec			;
+
+			dec 	bitcnt		;If bit is stop bit
+			breq 	getchar3	;   return
+						;else
+			ror 	Rxbyte		;   shift bit into Rxbyte
+			rjmp 	getchar2	;   go get next
+
+	getchar3:
+
+		st Y+,Rxbyte 
+		cpi Rxbyte,0x0D ; check for carriage return byte
+		breq exitrx ; if yes then end receiving
+		;if not, do below:
+		ldi bitcnt,9	;8 data bit + 1 stop bit
+		sb_wait:	
+			sbic PINB,RxD	;Wait for start bit
+		rjmp sb_wait
+		rjmp getchar1
+
+	exitrx:
+	ldi Rxbyte,0x0A ;add linebreak
+	st Y+,Rxbyte 
+	clr Rxbyte ; null terminated string
+	st Y,Rxbyte
+	
+	sbr r20, 3 ;set both rx and mode flags -  bits 0 (rx) and 1 (mode) in r20 , binary/dec 11/3
+
+	;enable timer0 overflow interrupt
+	ldi r16, 0b00000010 
+	OUT TIMSK0, R16
+	
+	pop   r0            ;  Restore SREG           
+	out   0x3F,   r0     
+reti   
 
 
 ;***************************************************************************
@@ -235,62 +292,6 @@ ret
 
 
 
-;***************************************************************************
-;* "getchar" - UART Interrupt routine
-;***************************************************************************
-
-PCINT:  
-	in    r0,     0x3F    ;Store SREG          
-	push  r0          
-	ldi	YL,LOW(msg)	; initialize pointer
-	ldi	YH,HIGH(msg)	; to tx msg address      
-	    
-	cbi PCMSK,RxD ; turn off PCINT
-	getchar:	
-			ldi bitcnt,9	;8 data bit + 1 stop bit
-	getchar1:	
-			rcall UART_delay	;0.5 bit delay
-	getchar2:	
-			rcall UART_delay	;1 bit delay
-			rcall UART_delay		
-
-			clc			;clear carry
-			sbic 	PINB,RxD	;if RX pin high
-			sec			;
-
-			dec 	bitcnt		;If bit is stop bit
-			breq 	getchar3	;   return
-						;else
-			ror 	Rxbyte		;   shift bit into Rxbyte
-			rjmp 	getchar2	;   go get next
-
-	getchar3:
-
-		st Y+,Rxbyte 
-		cpi Rxbyte,0x0D ; check for carriage return byte
-		breq exitrx ; if yes then end receiving
-		;if not CR, do below:
-		ldi bitcnt,9	;8 data bit + 1 stop bit
-		sb_wait:	
-			sbic PINB,RxD	;Wait for start bit
-		rjmp sb_wait
-		rjmp getchar1
-
-	exitrx:
-	ldi Rxbyte,0x0A ;add linebreak
-	st Y+,Rxbyte 
-	clr Rxbyte ; null terminated string
-	st Y,Rxbyte
-	
-	sbr r20, 3 ;set both rx and mode flags -  bits 0 (rx) and 1 (mode) in r20 , binary/dec 11/3
-
-	;enable timer interrupt
-	ldi r16, 0b00000100 
-	OUT TIMSK0, R16
-	
-	pop   r0            ;  Restore SREG           
-	out   0x3F,   r0     
-reti   
 
 
 ;***************************************************************************
@@ -301,7 +302,7 @@ reti
 ;* transmitting and receiving bytes. The total execution time is set by the
 ;* constant "b":
 ;*
-;*	3·b + 7 cycles (including rcall and ret)
+;*	3Â·b + 7 cycles (including rcall and ret)
 ;***************************************************************************
 
 .equ	b	= 163	;9600 bps @ 9.6 MHz crystal
@@ -374,4 +375,3 @@ do_spm:
 	;out SREG, r19
 	;sei
 ret
-
